@@ -12,10 +12,7 @@ secondFileData = importdata(SecondFilePath,delimiterIn, headerlinesIn);
 
 
 % obtain the eculedian distances for all the states
-eucledianDistance = 0;
-for index = 1 : colCount
-    eucledianDistance = eucledianDistance + sqrt(sum((firstFileData.data(:,index) - secondFileData.data(:,index)).^2));
-end
+eucledianDistance = sum(sqrt(sum((firstFileData.data - secondFileData.data).^2)));
 
 % obtain the similarity value
 similarity = 1 / (1 + (eucledianDistance / rowCount));
