@@ -8,7 +8,7 @@ firstFileData = importdata(FirstFilePath, delimiterIn, headerlinesIn);
 secondFileData = importdata(SecondFilePath,delimiterIn, headerlinesIn);
 
 % Get the size of the files
-[rowCount, colCount] = size(firstFileData.data);
+[rowCount, ~] = size(firstFileData.data);
 
 
 % obtain the eculedian distances for all the states

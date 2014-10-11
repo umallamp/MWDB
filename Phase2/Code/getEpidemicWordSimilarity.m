@@ -1,4 +1,5 @@
 function [ similarity ] = getEpidemicWordSimilarity( FirstFilePath, SecondFilePath )
+tic
 % Delimeter and header lines for input files
 delimiterIn = ',';
 headerlinesIn = 0;
@@ -26,6 +27,7 @@ for i = 1 : fRowCount
             break;
         end
     end
-end        
+end
+toc
 end
 
