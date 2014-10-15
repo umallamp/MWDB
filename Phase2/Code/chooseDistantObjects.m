@@ -9,8 +9,8 @@ randomPivot = randi([1 fileCount],1,1);
 [~, fname, ext] = fileparts(directoryFiles(randomPivot, 1).name);
 randomPivotObject = strcat(datasetDir, '/', fname, ext);
 
-% Initialize the similarity scores to zero
-similarityScores = zeros(length(directoryFiles), 1);
+% Initialize the similarity score to highest value
+minSimilarity = 1;
 
 for fileId = 1 : length(directoryFiles)
     % obtain meta data infromation fileds from data file
@@ -18,29 +18,28 @@ for fileId = 1 : length(directoryFiles)
     filePath = strcat(datasetDir, '/', fname, ext);
     
     % Compute similarity between the random pivot and all the other files
-    if(~strcmp(filePath, randomPivotObject))
-        similarityScores(fileId) = getChoiceSimulationSimilarity(randomPivotObject, filePath, similarityMeasureChoice);
+    % to get first pivot file
+    similarity = getChoiceSimulationSimilarity(randomPivotObject, filePath, similarityMeasureChoice);
+    if(similarity < minSimilarity)
+        minSimilarity = similarity;
+        FirstPivotObject = filePath;
+    end
+    
+end
+
+% Reset the similarity score to highest value
+minSimilarity = 1;
+
+for fileId = 1 : length(directoryFiles)
+    % obtain meta data infromation fileds from data file
+    [~, fname, ext] = fileparts(directoryFiles(fileId, 1).name);
+    filePath = strcat(datasetDir, '/', fname, ext);
+    
+    % Compute similarity between the first pivot and all the other files to
+    % get second pivot
+    similarity = getChoiceSimulationSimilarity(FirstPivotObject, filePath, similarityMeasureChoice);
+    if(similarity < minSimilarity)
+        minSimilarity = similarity;
+        SecondPivotObject = filePath;
     end
 end
-
-% Get the first pivot object
-[~, fileIndex] = min(similarityScores);
-[~, fname, ext] = fileparts(directoryFiles(fileIndex, 1).name);
-FirstPivotObject = strcat(datasetDir, '/', fname, ext);
-
-% Reset the similarity scores to zero
-similarityScores = zeros(length(directoryFiles), 1);
-
-for fileId = 1 : length(directoryFiles)
-    % obtain meta data infromation fileds from data file
-    [~, fname, ext] = fileparts(directoryFiles(fileId, 1).name);
-    filePath = strcat(datasetDir, '/', fname, ext);
-    
-    % Compute similarity between the random pivot and all the other files
-    similarityScores(fileId) = getChoiceSimulationSimilarity(FirstPivotObject, filePath, similarityMeasureChoice);
-end
-
-% Get the second pivot object
-[~, fileIndex] = min(similarityScores);
-[~, fname, ext] = fileparts(directoryFiles(fileIndex, 1).name);
-SecondPivotObject = strcat(datasetDir, '/', fname, ext);
