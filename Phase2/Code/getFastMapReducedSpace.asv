@@ -1,22 +1,20 @@
-function [ mappingError, reducedObjectSpace, pivotArray, distanceInOriginalSpace ] = getFastMapReducedSpace( datasetDir, similarityMeasureChoice, reducedDimensions )
+function [ mappingError, reducedObjectSpace, pivotArray, distanceMatrix ] = getFastMapReducedSpace( datasetDir, similarityMeasureChoice, reducedDimensions )
 
 % Read all the csv files in the given directory
 directoryFiles = dir(strcat(datasetDir,'/*.csv'));
+mappingError = 0;
 
 % Get the distances between objects in original space
-distanceInOriginalSpace = getOriginalDistanceMatrix(datasetDir, directoryFiles, similarityMeasureChoice);
-distanceInReducedSpace = zeros(size(distanceInOriginalSpace));
+distanceInOriginalSpaceMatrix = getOriginalDistanceMatrix(datasetDir, directoryFiles, similarityMeasureChoice);
+distanceInReducedSpace = zeros(size(distanceMatrix));
 
 % Global varibles used by fast map function
 reducedObjectSpace = zeros(length(directoryFiles), reducedDimensions);
 pivotArray = zeros(2, reducedDimensions);
 
-% ColumnId represents the current dimension calculated in fast map
 columnId = 0;
 
-fastMap(reducedDimensions, distanceInOriginalSpace);
-distanceInReducedSpace = getDistanceMatrixInReducedSpace(reducedObjectSpace, distanceInReducedSpace);
-mappingError = getMappingError(distanceInOriginalSpace, distanceInReducedSpace);
+fastMap(reducedDimensions, distanceMatrix);
 
 % Fast map function
     function fastMap(reducedDimensions, distanceMatrix)
@@ -83,13 +81,13 @@ for i = 1 : length(directoryFiles)
         
         % Compute similarity between the first file and second file and
         % assign to both the indices becuase of commutative properity
-        originalDistanceMatrix(str2double(firstfname), str2double(secondfname)) = getDistanceFromSimilarity(getChoiceSimulationSimilarity(firstFilePath, secondFilePath, similarityMeasureChoice));
+        originalDistanceMatrix(str2double(firstfname), str2double(secondfname)) = (1 / getChoiceSimulationSimilarity(firstFilePath, secondFilePath, similarityMeasureChoice)) - 1;
         originalDistanceMatrix(str2double(secondfname), str2double(firstfname)) = originalDistanceMatrix(str2double(firstfname), str2double(secondfname));
     end
 end
 end
 
-function [distanceInReducedSpace] = getDistanceMatrixInReducedSpace(reducedObjectSpace, distanceInReducedSpace)
+function getDistanceMatrixInReducedSpace(reducedObjectSpace, distanceInReducedSpace)
 % Get the size of reduced object space
 [row, ~] = size(reducedObjectSpace);
 
@@ -100,11 +98,6 @@ for i = 1 : row
         distanceInReducedSpace(j,i) = sqrt(sum((reducedObjectSpace(i, :) - reducedObjectSpace(j,:)).^2));
     end
 end
-end
-
-% Function to get the mapping error
-function [ mappingError ] = getMappingError(distanceInOriginalSpace, distanceInReducedSpace)
-mappingError = sum(distanceInOriginalSpace(:)) - sum(distanceInReducedSpace(:));
 end
     
 
