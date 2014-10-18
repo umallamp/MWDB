@@ -1,15 +1,13 @@
-function [ mappingError ] = getFastMapReducedSpace( datasetDir, similarityMeasureChoice, reducedDimensions )
+function [ mappingError, reducedObjectSpace, pivotArray, distanceMatrix ] = getFastMapReducedSpace( datasetDir, similarityMeasureChoice, reducedDimensions )
 
 % Read all the csv files in the given directory
 directoryFiles = dir(strcat(datasetDir,'/*.csv'));
+mappingError = 0;
 
 % Get the distances between objects in original space
 distanceMatrix = getOriginalDistanceMatrix(datasetDir, directoryFiles, similarityMeasureChoice);
 
 % Global varibles used by fast map function
-global reducedObjectSpace;
-global pivotArray;
-
 reducedObjectSpace = zeros(length(directoryFiles), reducedDimensions);
 pivotArray = zeros(2, reducedDimensions);
 
