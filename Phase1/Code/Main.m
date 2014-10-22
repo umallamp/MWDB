@@ -10,7 +10,7 @@ alpha = input('Enter the value of alpha : ');
 % Task 1
 disp('Task 1 - Epidemic word file generation started - wait for completion message');
 generateEpidemicWordFile(dir, w, h, r);
-disp(strcat('Task 1 - Epidemic word file generation completed - files are placed at ', dir, '/output'));
+disp(strcat('Task 1 - Epidemic word file generation completed - files are placed at ', dir, '/word'));
 
 % Task 2
 disp('Task 2 - Epidemic avg and diff file generation started - wait for completion message');
@@ -34,16 +34,16 @@ while true
     choice = input('Enter your choice : ');
     if(choice == 1)
         originalFile = importdata(strcat(dir,'/',num2str(visualizationFile),'.csv'),',');
-        wordFile = importdata(strcat(dir,'/output/', num2str(visualizationFile), '_epidemic_word_file.csv'), ',');
+        wordFile = importdata(strcat(dir,'/word/', num2str(visualizationFile), '.csv'), ',');
         generateHeatMap(originalFile.data, wordFile, w, connectivityGraph, stateIndexes);
     else
         if(choice == 2)
             originalFile = importdata(strcat(dir,'/',num2str(visualizationFile),'.csv'),',');
-            avgWordFile = importdata(strcat(dir,'/average/', num2str(visualizationFile), '_epidemic_word_file_avg.csv'), ',');
+            avgWordFile = importdata(strcat(dir,'/average/', num2str(visualizationFile), '.csv'), ',');
             generateHeatMap(originalFile.data, avgWordFile, w, connectivityGraph, stateIndexes);
         else
             originalFile = importdata(strcat(dir,'/',num2str(visualizationFile),'.csv'),',');
-            diffWordFile = importdata(strcat(dir,'/difference/', num2str(visualizationFile), '_epidemic_word_file_diff.csv'), ',');
+            diffWordFile = importdata(strcat(dir,'/difference/', num2str(visualizationFile), '.csv'), ',');
             generateHeatMap(originalFile.data, diffWordFile, w, connectivityGraph, stateIndexes);
         end
     end

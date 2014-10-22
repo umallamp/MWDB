@@ -21,11 +21,11 @@ end
 
 % read the connectivity graph and epidemic word file
 connectivityGraph = importdata(graphPath, delimiterIn, headerlinesIn);
-directoryFiles = dir(strcat(wordfilePath, '/output/*.csv'));
+directoryFiles = dir(strcat(wordfilePath, '/word/*.csv'));
 
 for fileId = 1 : length(directoryFiles)
-    rootfileName = strtok(directoryFiles(fileId, 1).name, '_');
-    epidemicWordFile = importdata(strcat(wordfilePath, '/output/', directoryFiles(fileId, 1).name), delimiterIn);
+    rootfileName = directoryFiles(fileId, 1).name;
+    epidemicWordFile = importdata(strcat(wordfilePath, '/word/', directoryFiles(fileId, 1).name), delimiterIn);
     
     % split the epidemic word file into 3 dimensional matrix where each
     % dimension corresponds to a state
@@ -61,7 +61,7 @@ for fileId = 1 : length(directoryFiles)
     % generate epidemic average and difference files
     epidemicAvgFile(:, metaDataStartIndex:metaDataEndIndex) = epidemicWordFile(:, metaDataStartIndex:metaDataEndIndex);
     epidemicDiffFile(:, metaDataStartIndex:metaDataEndIndex) = epidemicWordFile(:, metaDataStartIndex:metaDataEndIndex);
-    csvwrite(strcat(wordfilePath,'/average/', rootfileName, '_epidemic_word_file_avg.csv'), epidemicAvgFile);
-    csvwrite(strcat(wordfilePath,'/difference/', rootfileName, '_epidemic_word_file_diff.csv'), epidemicDiffFile);
+    csvwrite(strcat(wordfilePath,'/average/', rootfileName), epidemicAvgFile);
+    csvwrite(strcat(wordfilePath,'/difference/', rootfileName), epidemicDiffFile);
 end
 end

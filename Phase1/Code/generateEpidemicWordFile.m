@@ -11,8 +11,8 @@ fun = @(x) exp(-((x - mue).^2)/( 2 * (sigma.^2)));
 directoryFiles = dir(strcat(datasetDir,'/*.csv'));
 
 % create output folder if it does not exists in the current path
-if(~isequal(exist(strcat(datasetDir,'/output'), 'dir'),7))
-    mkdir(strcat(datasetDir,'/output'));
+if(~isequal(exist(strcat(datasetDir,'/word'), 'dir'),7))
+    mkdir(strcat(datasetDir,'/word'));
 end
 
 % find gaussian levels and level representatives
@@ -64,7 +64,7 @@ for fileId = 1 : length(directoryFiles)
     end
     
     % write the output to csv file
-    filename = strcat(datasetDir, '/output/', fname, '_epidemic_word_file', ext);
+    filename = strcat(datasetDir, '/word/', fname, ext);
     csvwrite(filename, fileRecords);
 end
 end
