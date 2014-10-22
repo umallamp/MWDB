@@ -68,8 +68,8 @@ end
 
 % Sort the similarites in descending order and obtain the files that are
 % most similar.
-sortedScores = sort(similarityScores, 'ascend');
-maxIndexes = similarityScores < sortedScores(similarFileRequired + 1);
+sortedScores = sort(similarityScores, 'descend');
+maxIndexes = similarityScores > sortedScores(similarFileRequired + 1);
 similarFiles = fNames(maxIndexes);
 
 end

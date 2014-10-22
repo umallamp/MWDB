@@ -1,4 +1,4 @@
-function [ mappingError, reducedObjectSpace, pivotArray, distanceInOriginalSpace ] = getFastMapReducedSpace( datasetDir, similarityMeasureChoice, reducedDimensions )
+function [ mappingError, reducedObjectSpace, pivotArray, distanceInOriginalSpace, distanceInReducedSpace ] = getFastMapReducedSpace( datasetDir, similarityMeasureChoice, reducedDimensions )
 
 % Read all the csv files in the given directory
 directoryFiles = dir(strcat(datasetDir,'/*.csv'));

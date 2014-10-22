@@ -5,7 +5,7 @@ fLength = length(FirstFileState);
 sLength = length(SecondFileState);
 
 % Initialize the DTWMatrix with inifinity
-DTWMatrix = Inf(fLength, length(SecondFileState));
+DTWMatrix = Inf(fLength, sLength);
 
 DTWMatrix(1, 1) = 0;
 
