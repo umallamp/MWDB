@@ -28,26 +28,14 @@ getQueryInReducedSpace(reducedDimensions);
         firstPivotObject = strcat(datasetDir, '/', num2str(firstPivot), ext);
         secondPivotObject = strcat(datasetDir, '/', num2str(secondPivot), ext);
         
-        % If the computation is fro the first dimension
-%         if(columnId == 1)
-            % Obtain the distances of query from first pivot object and
-            % second pivot object
-            distanceFromFirstPivot = getDistanceFromSimilarity(getChoiceSimulationSimilarity(firstPivotObject, newSimulationFilePath, similarityMeasureChoice));
-            distanceFromSecondPivot = getDistanceFromSimilarity(getChoiceSimulationSimilarity(secondPivotObject, newSimulationFilePath, similarityMeasureChoice));
-            
-            % Obtain the representation of query in the new dimension
-            pointInNewDimension = (distanceFromFirstPivot^2 + distanceMatrix(firstPivot, secondPivot)^2 - distanceFromSecondPivot^2) / (2*distanceMatrix(firstPivot, secondPivot));
-            reducedQuerySpace(columnId) = pointInNewDimension;
-%         else
-%             % Objtain the distances of pivot objects on the hyperplane
-%             % after projecting pivot object on the hyper plane
-%             distanceFromFirstPivot = sqrt((getDistanceFromSimilarity(getChoiceSimulationSimilarity(firstPivotObject, newSimulationFilePath, similarityMeasureChoice))^2) - (reducedObjectSpace(firstPivot,columnId-1) - reducedQuerySpace(1,columnId-1))^2);
-%             distanceFromSecondPivot = sqrt((getDistanceFromSimilarity(getChoiceSimulationSimilarity(secondPivotObject, newSimulationFilePath, similarityMeasureChoice))^2) - (reducedObjectSpace(secondPivot,columnId-1) - reducedQuerySpace(1,columnId-1))^2);
-%             distanceBetweenPivotObjects = sqrt((distanceMatrix(firstPivot, secondPivot)^2) - (reducedObjectSpace(firstPivot, columnId) - reducedObjectSpace(secondPivot, columnId-1))^2);
-%             
-%             % Obtain the point on the new dimension
-%             reducedQuerySpace(columnId) = (distanceFromFirstPivot^2 + distanceBetweenPivotObjects^2 - distanceFromSecondPivot^2) / (2*distanceBetweenPivotObjects);
-%         end
+        % Obtain the distances of query from first pivot object and
+        % second pivot object
+        distanceFromFirstPivot = getDistanceFromSimilarity(getChoiceSimulationSimilarity(firstPivotObject, newSimulationFilePath, similarityMeasureChoice));
+        distanceFromSecondPivot = getDistanceFromSimilarity(getChoiceSimulationSimilarity(secondPivotObject, newSimulationFilePath, similarityMeasureChoice));
+        
+        % Obtain the representation of query in the new dimension
+        pointInNewDimension = (distanceFromFirstPivot^2 + distanceMatrix(firstPivot, secondPivot)^2 - distanceFromSecondPivot^2) / (2*distanceMatrix(firstPivot, secondPivot));
+        reducedQuerySpace(columnId) = pointInNewDimension;
         
         % Recurssively call the function for all the dimension
         getQueryInReducedSpace(reducedDimensions - 1);

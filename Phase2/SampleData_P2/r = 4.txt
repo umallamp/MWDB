@@ -1,0 +1,1 @@
+For Top r-Latent Semantics use r = 4.

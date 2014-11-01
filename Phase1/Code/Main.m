@@ -3,14 +3,15 @@ dir = input('Enter the directory of datasets : ','s');
 w = input('Enter the window length : ');
 h = input('Enter the shift length : ');
 r = input('Enter the resolution : ');
-graphdir = input('Enter the director of connectivity graph : ', 's');
-alpha = input('Enter the value of alpha : ');
-
 
 % Task 1
 disp('Task 1 - Epidemic word file generation started - wait for completion message');
 generateEpidemicWordFile(dir, w, h, r);
 disp(strcat('Task 1 - Epidemic word file generation completed - files are placed at ', dir, '/word'));
+
+% Inputs requried for Task 2
+graphdir = input('Enter the director of connectivity graph : ', 's');
+alpha = input('Enter the value of alpha : ');
 
 % Task 2
 disp('Task 2 - Epidemic avg and diff file generation started - wait for completion message');

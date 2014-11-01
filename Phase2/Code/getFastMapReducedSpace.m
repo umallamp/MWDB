@@ -97,14 +97,25 @@ function [distanceInReducedSpace] = getDistanceMatrixInReducedSpace(reducedObjec
 for i = 1 : row
     for j = i : row
         distanceInReducedSpace(i,j) = sqrt(sum((reducedObjectSpace(i, :) - reducedObjectSpace(j,:)).^2));
-        distanceInReducedSpace(j,i) = sqrt(sum((reducedObjectSpace(i, :) - reducedObjectSpace(j,:)).^2));
+        distanceInReducedSpace(j,i) = distanceInReducedSpace(i,j);
     end
 end
 end
 
 % Function to get the mapping error
 function [ mappingError ] = getMappingError(distanceInOriginalSpace, distanceInReducedSpace)
-mappingError = sum(distanceInOriginalSpace(:)) - sum(distanceInReducedSpace(:));
+[originalRows, ~] = size(distanceInOriginalSpace);
+[reducedRows, ~] = size(distanceInReducedSpace);
+mappingError = 0;
+
+% Mapping Error computation
+for i = 1 : originalRows
+    for j = 1 : reducedRows
+        if(distanceInOriginalSpace(i,j) ~= 0)
+            mappingError = mappingError + ((distanceInOriginalSpace(i,j) - distanceInReducedSpace(i,j)) / distanceInOriginalSpace(i,j));
+        end
+    end
+end
 end
     
 

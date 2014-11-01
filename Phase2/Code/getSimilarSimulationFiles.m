@@ -24,5 +24,13 @@ sortedScores = sort(similarityScores, 'descend');
 maxIndexes = similarityScores > sortedScores(FileCount + 1);
 similarFiles = fNames(maxIndexes);
 
+if(SimilarityMeasureChoice == 'a' || SimilarityMeasureChoice == 'b')
+    isSimulationFile = true;
+else
+    isSimulationFile = false;
+end
+
+visualizeHeatMaps(datasetDir, newSimFilePath, similarFiles, isSimulationFile);
+
 end
 
