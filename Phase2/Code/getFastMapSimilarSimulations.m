@@ -46,18 +46,17 @@ function [similarFiles, similarityScores] = findMostSimilarObjectsToQuery(reduce
 
 % define the variables required fro computation
 [row, ~] = size(reducedObjectSpace);
-similarityScores = zeros(1, row);
-fNames = zeros(1, row);
+similarityScores = zeros(row, 2);
+
 % Compute the distance between object and query
 for i = 1: row
-    fNames(i) = i;
-    similarityScores(i) = sqrt(sum((reducedObjectSpace(i, :) - reducedQuerySpace).^2));
+    similarityScores(i, 2) = i;
+    similarityScores(i, 1) = sqrt(sum((reducedObjectSpace(i, :) - reducedQuerySpace).^2));
 end
 
 % Sort the similarites in descending order and obtain the files that are
 % most similar.
-sortedScores = sort(similarityScores, 'ascend');
-maxIndexes = similarityScores < sortedScores(similarFileRequired + 1);
-similarFiles = fNames(maxIndexes);
+sortedScores = sortrows(similarityScores);
+similarFiles = sortedScores(1 : similarFileRequired, :);
 
 end
