@@ -1,7 +1,15 @@
-function [ similarFiles, similarityScores, reducedQuerySpace ] = getFastMapSimilarSimulations( newSimulationFilePath, reducedDimensions, similarFileRequired, reducedObjectSpace, pivotArray, datasetDir, distanceMatrix, similarityMeasureChoice  )
+function [ similarFiles, similarityScores, reducedQuerySpace ] = getFastMapSimilarSimulations( newSimulationFilePath, reducedDimensions, similarFileRequired, reducedObjectSpace, pivotArray, datasetDir, distanceMatrix, similarityMeasureChoice, connectivityGraphLoc  )
 
 % Get metadata about the files
 [~, ~, ext] = fileparts(newSimulationFilePath);
+
+arrUniqueWords = [];
+idfArray = [];
+
+% Compute IDF if the similariy is f g or h
+if(similarityMeasureChoice == 'f' || similarityMeasureChoice == 'g' || similarityMeasureChoice == 'h')
+    [arrUniqueWords, idfArray] = getTermIDF(datasetDir);
+end
 
 % Matrix for representation of query in reduced space
 reducedQuerySpace = zeros(1, reducedDimensions);
@@ -30,8 +38,8 @@ getQueryInReducedSpace(reducedDimensions);
         
         % Obtain the distances of query from first pivot object and
         % second pivot object
-        distanceFromFirstPivot = getDistanceFromSimilarity(getChoiceSimulationSimilarity(firstPivotObject, newSimulationFilePath, similarityMeasureChoice));
-        distanceFromSecondPivot = getDistanceFromSimilarity(getChoiceSimulationSimilarity(secondPivotObject, newSimulationFilePath, similarityMeasureChoice));
+        distanceFromFirstPivot = getDistanceFromSimilarity(getChoiceSimulationSimilarity(firstPivotObject, newSimulationFilePath, similarityMeasureChoice, connectivityGraphLoc, arrUniqueWords, idfArray), similarityMeasureChoice);
+        distanceFromSecondPivot = getDistanceFromSimilarity(getChoiceSimulationSimilarity(secondPivotObject, newSimulationFilePath, similarityMeasureChoice, connectivityGraphLoc, arrUniqueWords, idfArray),similarityMeasureChoice );
         
         % Obtain the representation of query in the new dimension
         pointInNewDimension = (distanceFromFirstPivot^2 + distanceMatrix(firstPivot, secondPivot)^2 - distanceFromSecondPivot^2) / (2*distanceMatrix(firstPivot, secondPivot));

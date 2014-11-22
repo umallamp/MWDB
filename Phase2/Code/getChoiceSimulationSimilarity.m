@@ -1,4 +1,4 @@
-function [ similarity ] = getChoiceSimulationSimilarity( FirstFilePath, SecondFilePath, Choice )
+function [ similarity ] = getChoiceSimulationSimilarity( FirstFilePath, SecondFilePath, Choice, connectivityGraphLoc, arrUniqueWords, idfArray )
 % Get the similarity score based on the user choice
     switch Choice
         % Eculedian Distance
@@ -9,13 +9,22 @@ function [ similarity ] = getChoiceSimulationSimilarity( FirstFilePath, SecondFi
             similarity = getDTWSimilarity(FirstFilePath, SecondFilePath);
             % Word File Distance
         case 'c'
-            similarity = getEpidemicWordSimilarity(FirstFilePath, SecondFilePath);
+            similarity = getSimilarityMeasureforWindows(FirstFilePath, SecondFilePath);
             % Average File Distance
         case 'd'
-            similarity = getEpidemicWordSimilarity(FirstFilePath, SecondFilePath);
+            similarity = getSimilarityMeasureforWindows(FirstFilePath, SecondFilePath);
             % Difference File Distance
         case 'e'
-            similarity = getEpidemicWordSimilarity(FirstFilePath, SecondFilePath);
+            similarity = getSimilarityMeasureforWindows(FirstFilePath, SecondFilePath);
+            % Word File Distance with A Matrix
+        case 'f'
+            similarity = Proj2_1f(FirstFilePath, SecondFilePath, connectivityGraphLoc, arrUniqueWords, idfArray);
+            % Difference File Distance with A Matrix
+        case 'g'
+            similarity = Proj2_1f(FirstFilePath, SecondFilePath, connectivityGraphLoc, arrUniqueWords, idfArray);
+            % Difference File Distance with A Matrix
+        case 'h'
+            similarity = Proj2_1f(FirstFilePath, SecondFilePath, connectivityGraphLoc, arrUniqueWords, idfArray);
     end
 end
 

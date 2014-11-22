@@ -6,8 +6,8 @@ function [ FirstPivotObject, SecondPivotObject ] = getPivotObjects( distanceMatr
 [row, col] = size(distanceMatrix);
 
 % Get a random pivot
-% randomPivot = randi([1 row],1,1);
-randomPivot = 1;
+randomPivot = randi([1 row],1,1);
+% randomPivot = 1;
 
 distanceFromFirstPivot = zeros(1, col);
 distanceFromSecondPivot = zeros(1, col);

@@ -1,10 +1,16 @@
-function [ mappingError, reducedObjectSpace, pivotArray, distanceInOriginalSpace, distanceInReducedSpace ] = getFastMapReducedSpace( datasetDir, similarityMeasureChoice, reducedDimensions )
+function [ mappingError, reducedObjectSpace, pivotArray, distanceInOriginalSpace, distanceInReducedSpace ] = getFastMapReducedSpace( datasetDir, similarityMeasureChoice, reducedDimensions, connectivityGraphLoc )
 
 % Read all the csv files in the given directory
 directoryFiles = dir(strcat(datasetDir,'/*.csv'));
+arrUniqueWords = [];
+idfArray = [];
+
+if(similarityMeasureChoice == 'f' || similarityMeasureChoice == 'g' || similarityMeasureChoice == 'h')
+    [arrUniqueWords, idfArray] = getTermIDF(datasetDir);
+end
 
 % Get the distances between objects in original space
-distanceInOriginalSpace = getOriginalDistanceMatrix(datasetDir, directoryFiles, similarityMeasureChoice);
+distanceInOriginalSpace = getOriginalDistanceMatrix(datasetDir, directoryFiles, similarityMeasureChoice, connectivityGraphLoc, arrUniqueWords, idfArray);
 distanceInReducedSpace = zeros(size(distanceInOriginalSpace));
 
 % Global varibles used by fast map function
@@ -63,7 +69,7 @@ mappingError = getMappingError(distanceInOriginalSpace, distanceInReducedSpace);
     end
 end
 
-function [ originalDistanceMatrix ] = getOriginalDistanceMatrix(datasetDir, directoryFiles, similarityMeasureChoice)
+function [ originalDistanceMatrix ] = getOriginalDistanceMatrix(datasetDir, directoryFiles, similarityMeasureChoice, connectivityGraphLoc, arrUniqueWords, idfArray)
 % Get the number of files in the directory
 fileCount = length(directoryFiles);
 
@@ -83,10 +89,12 @@ for i = 1 : length(directoryFiles)
         
         % Compute similarity between the first file and second file and
         % assign to both the indices becuase of commutative properity
-        originalDistanceMatrix(str2double(firstfname), str2double(secondfname)) = getDistanceFromSimilarity(getChoiceSimulationSimilarity(firstFilePath, secondFilePath, similarityMeasureChoice));
+        originalDistanceMatrix(str2double(firstfname), str2double(secondfname)) = getDistanceFromSimilarity(getChoiceSimulationSimilarity(firstFilePath, secondFilePath, similarityMeasureChoice, connectivityGraphLoc, arrUniqueWords, idfArray), similarityMeasureChoice);
         originalDistanceMatrix(str2double(secondfname), str2double(firstfname)) = originalDistanceMatrix(str2double(firstfname), str2double(secondfname));
     end
 end
+% distanceMatrix = (originalDistanceMatrix - min(originalDistanceMatrix(:))) / (max(originalDistanceMatrix(:)) - min(originalDistanceMatrix(:)));
+% originalDistanceMatrix = distanceMatrix;
 end
 
 function [distanceInReducedSpace] = getDistanceMatrixInReducedSpace(reducedObjectSpace, distanceInReducedSpace)
@@ -117,5 +125,3 @@ for i = 1 : originalRows
     end
 end
 end
-    
-

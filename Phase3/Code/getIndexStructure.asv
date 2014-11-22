@@ -1,0 +1,14 @@
+function [ output_args ] = getIndexStructure( bitsPerDimensions, wordFilePath )
+
+delimiterIn = ',';
+headerlinesIn = 1;
+
+wordVectors = importdata(filename, delimiterIn, headerlinesIn);
+
+[rowCount, colCount] = size(wordVectors);
+
+
+
+
+end
+

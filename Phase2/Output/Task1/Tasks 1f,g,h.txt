@@ -1,0 +1,28 @@
+task 1-f
+
+>> Proj2_1f
+Input the folder for input data files: C:\Users\pdadi\Downloads\SampleData_P2\SampleData_P2\Set_of_Simulation_Files\word
+Enter the input for File - 1 15.csv
+Enter the input for File - 2 11.csv
+Enter the connectivity Graph location C:\Users\pdadi\Downloads\sampledata_P1_F14\sampledata_P1_F14\Graphs\LocationMatrix.xlsx
+The final similarity is 297.581493>>
+>>
+
+task 1-g
+
+>> Proj2_1f
+Input the folder for input data files: C:\Users\pdadi\Downloads\SampleData_P2\SampleData_P2\Set_of_Simulation_Files\average
+Enter the input for File - 1 18.csv
+Enter the input for File - 2 19.csv
+Enter the connectivity Graph location C:\Users\pdadi\Downloads\sampledata_P1_F14\sampledata_P1_F14\Graphs\LocationMatrix.xlsx
+The final similarity is 22551.61811>>
+>> 
+
+task 1-h
+
+>> Proj2_1f
+Input the folder for input data files: C:\Users\pdadi\Downloads\SampleData_P2\SampleData_P2\Set_of_Simulation_Files\difference
+Enter the input for File - 1 4.csv
+Enter the input for File - 2 4.csv
+Enter the connectivity Graph location C:\Users\pdadi\Downloads\sampledata_P1_F14\sampledata_P1_F14\Graphs\LocationMatrix.xlsx
+The final similarity is 7981.763769>>

@@ -1,5 +1,4 @@
 function [ similarity ] = getEpidemicWordSimilarity( FirstFilePath, SecondFilePath )
-tic
 % Delimeter and header lines for input files
 delimiterIn = ',';
 headerlinesIn = 0;
@@ -14,20 +13,8 @@ secondFileData = importdata(SecondFilePath, delimiterIn, headerlinesIn);
 uniqueFirstFileWords = unique(firstFileData(:,4:colCount), 'rows');
 uniqueSecondFileWords = unique(secondFileData(:,4:colCount), 'rows');
 
-% Get the size of the files
-[fRowCount, ~] = size(uniqueFirstFileWords);
-[sRowCount, ~] = size(uniqueSecondFileWords);
+commonWords = intersect(uniqueFirstFileWords, uniqueSecondFileWords, 'rows');
+[similarity, ~] = size(commonWords);
 
-% Get the similarity between two files
-similarity = 0;
-for i = 1 : fRowCount
-    for j = 1 : sRowCount
-        if(all(uniqueFirstFileWords(i,:) == uniqueSecondFileWords(j,:)))
-            similarity = similarity + 1;
-            break;
-        end
-    end
-end
-toc
 end
 

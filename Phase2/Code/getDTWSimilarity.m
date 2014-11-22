@@ -1,5 +1,4 @@
 function [ avgSimilarity ] = getDTWSimilarity( FirstFilePath, SecondFilePath )
-tic
 % Delimeter and header lines for input files
 delimiterIn = ',';
 headerlinesIn = 1;
@@ -20,6 +19,5 @@ end
 % Get average similarity
 avgSimilarity = 1 / (1 + (similarity / colCount));
 
-toc
 end
 
