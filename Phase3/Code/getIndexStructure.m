@@ -1,4 +1,4 @@
-function [ wordFileVectors ] = getIndexStructure( bitsPerDimensions, wordfilePath )
+function [ wordFileVectors, bitsPerDims ] = getIndexStructure( bitsPerVector, wordfilePath )
 
 delimiterIn = ',';
 metaDataCols = 3;
@@ -16,6 +16,8 @@ wordFileVectors = zeros(rowCount,colCount, totalFiles);
 minValues = Inf(1, colCount - metaDataCols);
 maxValues = -1 * Inf(1, colCount - metaDataCols);
 
+% process each word file and find the min and max boundaries for each
+% vector
 for fileId = 1 : length(directoryFiles)
     
     % read the file from the directory
@@ -33,5 +35,21 @@ for fileId = 1 : length(directoryFiles)
     % add wordfile data to three dimensional matrix
     wordFileVectors(:, :, str2double(fname)) = epidemicWordFile;
 end
+
+% array for bits per dimension
+bitsPerDims = zeros(1, colCount - metaDataCols);
+
+% compute the number of bits for each dimension
+remainder = mod(bitsPerVector, (colCount - metaDataCols));
+bitsPerDim = floor(bitsPerVector / (colCount - metaDataCols));
+
+for index = 1 : colCount - metaDataCols
+    if(index <= remainder)
+        bitsPerDims(index) = bitsPerDim + 1;
+    else
+        bitsPerDims(index) = bitsPerDim;
+    end
+end
+
 end
 
