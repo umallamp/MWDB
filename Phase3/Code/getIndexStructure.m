@@ -1,39 +1,48 @@
 function [ wordFileVectors, bitsPerDims ] = getIndexStructure( bitsPerVector, wordfilePath )
 
 delimiterIn = ',';
-metaDataCols = 3;
-directoryFiles = dir(strcat(wordfilePath, '/*.csv'));
-totalFiles = length(directoryFiles);
-
-% extract all meta data information from sample file
-sampleFile = importdata(strcat(wordfilePath, '/', directoryFiles(1, 1).name), delimiterIn);
-[rowCount, colCount] = size(sampleFile);
-
-% 3 dimensional array to store the values of word files
-wordFileVectors = zeros(rowCount,colCount, totalFiles);
-
-% arrays to store min max values occured in the dimensions
-minValues = Inf(1, colCount - metaDataCols);
-maxValues = -1 * Inf(1, colCount - metaDataCols);
-
-% process each word file and find the min and max boundaries for each
-% vector
+headerlinesIn = 0;
+colStart = 2;
+directoryFiles = dir(strcat(datasetDir,'/*.csv'));
+entireWords = [];
 for fileId = 1 : length(directoryFiles)
     
-    % read the file from the directory
-    [~, fname, ~] = fileparts(directoryFiles(fileId, 1).name);
-    epidemicWordFile = importdata(strcat(wordfilePath, '/', directoryFiles(fileId, 1).name), delimiterIn);
+    % obtain required fileds from data file
+    [~, fname, ext] = fileparts(directoryFiles(fileId, 1).name);
+    filePath = strcat(datasetDir, '/', fname, ext);
     
-    % get min and max values for each dimension in the current file
-    minValue = min(epidemicWordFile(:, metaDataCols + 1 : colCount));
-    maxValue = max(epidemicWordFile(:, metaDataCols + 1 : colCount));
+    % read the contents of the file
+    fileData = importdata(filePath, delimiterIn, headerlinesIn);
+    [~, colCount] = size(fileData);
     
-    % update min and max values for all the files
-    minValues = min(minValues, minValue);
-    maxValues = max(maxValues, maxValue);
+    % get all the words among the files
+    entireWords = [entireWords; unique(fileData(:, colStart : colCount), 'rows')];
+end
+
+% get the unique words among all the files
+uniqueWords = unique(entireWords, 'rows');
+
+% data matrix for SVD
+dataMatrix = zeros(length(directoryFiles), length(uniqueWords));
+
+% iterate over the number of files in the directory
+for fileId = 1 : length(directoryFiles)
+    display(strcat('Started processing file : ', num2str(fileId)));
     
-    % add wordfile data to three dimensional matrix
-    wordFileVectors(:, :, str2double(fname)) = epidemicWordFile;
+    % obtain required fileds from data file
+    [~, fname, ext] = fileparts(directoryFiles(fileId, 1).name);
+    filePath = strcat(datasetDir, '/', fname, ext);
+    
+    % read the contents of the file
+    fileData = importdata(filePath, delimiterIn, headerlinesIn);
+    [~, colCount] = size(fileData);
+
+    % iterate over the unique words
+    for wordId = 1 : length(uniqueWords)
+        % count the number of instances of unique word in the file
+        dataMatrix(fileId, wordId) = sum(ismember(fileData(:, colStart : colCount),uniqueWords(wordId, :),'rows'));
+    end
+    display(strcat('Finished processing file : ', num2str(fileId)));
 end
 
 % array for bits per dimension

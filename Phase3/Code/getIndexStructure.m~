@@ -1,46 +1,45 @@
-function [ wordFileVectors ] = getIndexStructure( bitsPerVector, wordfilePath )
+function [ wordFileVectors, bitsPerDims ] = getIndexStructure( bitsPerVector, wordfilePath )
 
 delimiterIn = ',';
-metaDataCols = 3;
+colStart = 2;
 directoryFiles = dir(strcat(wordfilePath, '/*.csv'));
-totalFiles = length(directoryFiles);
 
-% extract all meta data information from sample file
-sampleFile = importdata(strcat(wordfilePath, '/', directoryFiles(1, 1).name), delimiterIn);
-[rowCount, colCount] = size(sampleFile);
+% array to store all the words in each word file
+entireWords = [];
 
-% 3 dimensional array to store the values of word files
-wordFileVectors = zeros(rowCount,colCount, totalFiles);
-
-% arrays to store min max values occured in the dimensions
-minValues = Inf(1, colCount - metaDataCols);
-maxValues = -1 * Inf(1, colCount - metaDataCols);
-
-% process each word file and find the min and max boundaries for each
+% process each word file and find the unique words in each file
 % vector
 for fileId = 1 : length(directoryFiles)
     
-    % read the file from the directory
-    [~, fname, ~] = fileparts(directoryFiles(fileId, 1).name);
-    epidemicWordFile = importdata(strcat(wordfilePath, '/', directoryFiles(fileId, 1).name), delimiterIn);
+    % obtain required fileds from data file
+    [~, fname, ext] = fileparts(directoryFiles(fileId, 1).name);
+    filePath = strcat(datasetDir, '/', fname, ext);
     
-    % get min and max values for each dimension in the current file
-    minValue = min(epidemicWordFile(:, metaDataCols + 1 : colCount));
-    maxValue = max(epidemicWordFile(:, metaDataCols + 1 : colCount));
+    % read the contents of the file
+    fileData = importdata(filePath, delimiterIn, headerlinesIn);
+    [~, colCount] = size(fileData);
     
-    % update min and max values for all the files
-    minValues = min(minValues, minValue);
-    maxValues = max(maxValues, maxValue);
-    
-    % add wordfile data to three dimensional matrix
-    wordFileVectors(:, :, str2double(fname)) = epidemicWordFile;
+    % get all the words among the files
+    entireWords = [entireWords; unique(fileData(:, colStart : colCount), 'rows')];
 end
 
+% get the unique words among all the files
+uniqueWords = unique(entireWords, 'rows');
+
 % array for bits per dimension
-bitsPerDim = zeros(1, colCount - metaDataCols);
+bitsPerDims = zeros(1, colCount - metaDataCols);
 
 % compute the number of bits for each dimension
-remainder = mod(bitsPerVector
+remainder = mod(bitsPerVector, (colCount - metaDataCols));
+bitsPerDim = floor(bitsPerVector / (colCount - metaDataCols));
+
+for index = 1 : colCount - metaDataCols
+    if(index <= remainder)
+        bitsPerDims(index) = bitsPerDim + 1;
+    else
+        bitsPerDims(index) = bitsPerDim;
+    end
+end
 
 end
 

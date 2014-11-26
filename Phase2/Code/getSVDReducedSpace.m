@@ -2,45 +2,22 @@ function [ entireWords, uniqueWords, dataMatrix ] = getSVDReducedSpace( datasetD
 
 delimiterIn = ',';
 headerlinesIn = 0;
-colStart = 2;
 directoryFiles = dir(strcat(datasetDir,'/*.csv'));
-entireWords = [];
-for fileId = 1 : length(directoryFiles)
-    
-    % obtain required fileds from data file
-    [~, fname, ext] = fileparts(directoryFiles(fileId, 1).name);
-    filePath = strcat(datasetDir, '/', fname, ext);
-    
-    % read the contents of the file
-    fileData = importdata(filePath, delimiterIn, headerlinesIn);
-    [~, colCount] = size(fileData);
-    
-    % get all the words among the files
-    entireWords = [entireWords; unique(fileData(:, colStart : colCount), 'rows')];
-end
 
-% get the unique words among all the files
-uniqueWords = unique(entireWords, 'rows');
+[rowSize,columnSize] = size(filesRead);
+mapObj = containers.Map();
 
-% data matrix for SVD
-dataMatrix = size(length(directoryFiles), length(uniqueWords));
-
-% iterate over the number of files in the directory
-for fileId = 1 : length(directoryFiles)
-    display(strcat('Started processing file : ', num2str(fileId)));
+% Constructing a HashMap to hold all the unique values
+for k=1:rowSize
+    fileName=strcat(directory,'/',(directoryFiles(k).name));
+    dataForFile = csvread(fileName,0,1);
+    [rSize,cSize] = size(dataForFile);
     
-    % obtain required fileds from data file
-    [~, fname, ext] = fileparts(directoryFiles(fileId, 1).name);
-    filePath = strcat(datasetDir, '/', fname, ext);
-    
-    % read the contents of the file
-    fileData = importdata(filePath, delimiterIn, headerlinesIn);
-    [~, colCount] = size(fileData);
-
-    % iterate over the unique words
-    for wordId = 1 : length(uniqueWords)
-        % count the number of instances of unique word in the file
-        dataMatrix(fileId, wordId) = sum(ismember(fileData(:, colStart : colCount),uniqueWords(wordId, :),'rows'));
+    for i=1:rSize
+        intermediateString = mat2str(dataForFile(i,:));
+        %intermediateString = strcat(intermediateString,num2str(dataForFile1(i,j)),',');
+        if(~isKey(mapObj,intermediateString))
+            mapObj(intermediateString) = 1;
+        end
     end
-    display(strcat('Finished processing file : ', num2str(fileId)));
 end
