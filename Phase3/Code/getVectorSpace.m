@@ -1,59 +1,77 @@
-function [ uniqueVectorsMap ] = getVectorSpace( datasetDir )
+function [ dataMatrix ] = getVectorSpace( datasetDir )
 
 delimiterIn = ',';
 headerlinesIn = 0;
+colStart = 4;
 directoryFiles = dir(strcat(datasetDir,'/*.csv'));
 
-[fileCount, ~] = size(filesRead);
+[fileCount, ~] = size(directoryFiles);
+fileCount = 10;
 
 % define hash map to store unique words in each word file
-uniqueVectorsMap = containers.Map();
+dataSetUniqueVectors = containers.Map();
 
 % Constructing a HashMap to hold all the unique values
 for index = 1 : fileCount
-    
     % get the file path
-    fileName = strcat(directory, '/', (directoryFiles(index).name));
+    fileName = strcat(datasetDir, '/', (directoryFiles(index).name));
     dataForFile = importdata(fileName, delimiterIn, headerlinesIn);
     
-    [rSize, ~] = size(dataForFile);
+    [rSize, cSize] = size(dataForFile);
     
-    for i=1:rSize
+    for i = 1 : rSize
         % convert the word to string
-        stringVector = mat2str(dataForFile(i,:));
+        wordVector = mat2str(dataForFile(i, colStart : cSize));
         
         % insert the word into the hashmap
-        if(~isKey(uniqueVectorsMap, stringVector))
-            uniqueVectorsMap(stringVector) = 1;
+        if(~isKey(dataSetUniqueVectors, wordVector))
+            dataSetUniqueVectors(wordVector) = 1;
         end
     end
+    
+    disp(index);
+    
 end
 
 % get all the unique words from hashmap
-uniqueVectors = mapObj.keys;
+uniqueVectors = dataSetUniqueVectors.keys;
+[~ , totalUniqueVectors] = size(uniqueVectors);
 
-[~ , colCount] = size(uniqueVectors);
+% matrix to store vectors
+dataMatrix = zeros (fileCount, totalUniqueVectors);
 
-binaryVectorMatrix = zeros (fileCount, colCount);
-for k=1:rowSize
-    %disp('I am here');
-    mapObjPerFile = containers.Map();
-    fileName=strcat(directory,'/',(filesRead(k).name));
-    [pathstr,name,ext] = fileparts(filesRead(k).name); 
-    dataForFile = csvread(fileName,0,1);
-    uniqueFileWords = unique(dataForFile, 'rows');
-    [rSizeUniq,cSizeUniq] = size(uniqueFileWords);
-    for i = 1:rSizeUniq
-        intermediateString = mat2str(uniqueFileWords(i,:));
-        if(~isKey(mapObjPerFile,intermediateString))
-            mapObjPerFile(intermediateString) = 1;
+for index = 1 : fileCount
+    % map for every file
+    fileVector = containers.Map();
+    fileName = strcat(datasetDir, '/', (directoryFiles(index).name));
+    [~, fName, ~] = fileparts(directoryFiles(index).name); 
+    
+    dataForFile = importdata(fileName, delimiterIn, headerlinesIn);
+    [~, cSize] = size(dataForFile);
+    
+    % get the unique words in the file
+    requiredFileData = dataForFile(:, colStart : cSize);
+    uniqueFileVectors = unique(requiredFileData, 'rows');
+    [uniqueCount, ~] = size(uniqueFileVectors);
+    
+    for i = 1 : uniqueCount
+        % convert word to string
+        wordVector = mat2str(uniqueFileVectors(i,:));
+        
+        % if the word is not present in the map intialize to 1
+        if(~isKey(fileVector, wordVector))
+            fileVector(wordVector) = 1;
+        % if the word is present in the map add 1
+        else
+            fileVector(wordVector) = fileVector(wordVector) + 1;
         end
     end
-    %disp(arrWords(1));
-
-    for i=1:colCount
-        if(isKey(mapObjPerFile,arrWords(i)))
-            binaryVectorMatrix(str2num(name),i) = 1;
+    
+    % construct the vector for the file
+    for i = 1 : totalUniqueVectors
+        % if the the file has the feature
+        if(isKey(fileVector, uniqueVectors(i)))
+            dataMatrix(str2double(fName), i) = fileVector(uniqueVectors(i));
         end
     end
 end
