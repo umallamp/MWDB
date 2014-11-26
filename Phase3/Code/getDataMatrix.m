@@ -20,8 +20,10 @@ for fileId = 1 : length(directoryFiles)
     fileData = importdata(filePath, delimiterIn, headerlinesIn);
     [~, colCount] = size(fileData);
     
+    colIndexVector = [2 colStart : colCount];
+    
     % get all the words among the files
-    fileUniqueWords = unique(fileData(:, colStart : colCount), 'rows');
+    fileUniqueWords = unique(fileData(:, colIndexVector), 'rows');
     [rSize, cSize] = size(fileUniqueWords);
     
     % fileFeatureCount is a matrix with the structure as
@@ -31,12 +33,12 @@ for fileId = 1 : length(directoryFiles)
     for index = 1 : rSize
         count = count + 1;
         fileFeatureCount(count, 1) = fileId;
-        fileFeatureCount(count, 2) = sum(ismember(fileData(:, colStart : colCount), fileUniqueWords(index, :),'rows'));
+        fileFeatureCount(count, 2) = sum(ismember(fileData(:, colIndexVector), fileUniqueWords(index, :),'rows'));
         fileFeatureCount(count, 3 : cSize + 2) = fileUniqueWords(index, :);
     end
     
     % create the entire words
-    entireWords = [entireWords; unique(fileData(:, colStart : colCount), 'rows')];
+    entireWords = [entireWords; unique(fileData(:, colIndexVector), 'rows')];
 end
 
 % get the unique words among all the files

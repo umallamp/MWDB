@@ -1,8 +1,9 @@
 function [ entireWords, uniqueWords, dataMatrix ] = getDataMatrix( datasetDir )
 
+% required fileds
 delimiterIn = ',';
 headerlinesIn = 0;
-colStart = 4;
+colStart = 2;
 directoryFiles = dir(strcat(datasetDir,'/*.csv'));
 entireWords = [];
 fileFeatureCount = [];
@@ -19,13 +20,16 @@ for fileId = 1 : length(directoryFiles)
     fileData = importdata(filePath, delimiterIn, headerlinesIn);
     [~, colCount] = size(fileData);
     
+    cloIndexVector = 
+    
     % get all the words among the files
     fileUniqueWords = unique(fileData(:, colStart : colCount), 'rows');
     [rSize, cSize] = size(fileUniqueWords);
     
     % fileFeatureCount is a matrix with the structure as
     % 1. fileId
-    % 2. sum of 
+    % 2. count of the words in the file
+    % 3 : cSize feature values of the word
     for index = 1 : rSize
         count = count + 1;
         fileFeatureCount(count, 1) = fileId;
@@ -33,6 +37,7 @@ for fileId = 1 : length(directoryFiles)
         fileFeatureCount(count, 3 : cSize + 2) = fileUniqueWords(index, :);
     end
     
+    % create the entire words
     entireWords = [entireWords; unique(fileData(:, colStart : colCount), 'rows')];
 end
 
