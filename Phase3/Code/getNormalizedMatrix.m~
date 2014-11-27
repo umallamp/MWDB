@@ -13,8 +13,7 @@ minMatrix = repmat(minValues, [rowCount 1]);
 % get normalized values
 normalized = (unNormalized - minMatrix)./normFactorMatrix;
 
-% replace all nan with 0
-normalized(isnan(normalized)) = 0;
+
 
 end
 

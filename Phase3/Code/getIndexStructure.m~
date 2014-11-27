@@ -1,39 +1,20 @@
-function [ wordFileVectors, bitsPerDims ] = getIndexStructure( bitsPerVector, wordfilePath )
+function [ wordFileVectors, bitsPerDims ] = getIndexStructure( bitsPerVector, datasetDir )
 
-delimiterIn = ',';
-colStart = 2;
-directoryFiles = dir(strcat(wordfilePath, '/*.csv'));
+% construct the data matrix for all the files
+[~, uniqueWords, dataMatrix] = getDataMatrix(datasetDir);
+[rowCount, colCount] = size(dataMatrix);
 
-% array to store all the words in each word file
-entireWords = [];
-
-% process each word file and find the unique words in each file
-% vector
-for fileId = 1 : length(directoryFiles)
-    
-    % obtain required fileds from data file
-    [~, fname, ext] = fileparts(directoryFiles(fileId, 1).name);
-    filePath = strcat(datasetDir, '/', fname, ext);
-    
-    % read the contents of the file
-    fileData = importdata(filePath, delimiterIn, headerlinesIn);
-    [~, colCount] = size(fileData);
-    
-    % get all the words among the files
-    entireWords = [entireWords; unique(fileData(:, colStart : colCount), 'rows')];
-end
-
-% get the unique words among all the files
-uniqueWords = unique(entireWords, 'rows');
+% get normalized matrix
+dataMatrix = getNormalizedMatrix(dataMatrix);
 
 % array for bits per dimension
-bitsPerDims = zeros(1, colCount - metaDataCols);
+bitsPerDims = zeros(1, colCount);
 
 % compute the number of bits for each dimension
-remainder = mod(bitsPerVector, (colCount - metaDataCols));
-bitsPerDim = floor(bitsPerVector / (colCount - metaDataCols));
+remainder = mod(bitsPerVector, colCount);
+bitsPerDim = floor(bitsPerVector / colCount);
 
-for index = 1 : colCount - metaDataCols
+for index = 1 : colCount
     if(index <= remainder)
         bitsPerDims(index) = bitsPerDim + 1;
     else
@@ -41,5 +22,20 @@ for index = 1 : colCount - metaDataCols
     end
 end
 
+% compute the vector approximation for each file and add to vector
+% approximiation index
+vectorApproxIndex = '';
+for fileId = 1 : rowCount
+    fileApprox = '';
+    for dimId = 1 : colCount
+        partition = 1 / bitsPerDims(dimId);
+        for bit = 0 : (bitsPerDims(dimId) - 1)
+            if((bit * partition) <= dataMatrix(fileId, dimId) && dataMatrix(fileId, dimId) < ((bit + 1) * partition))
+                fileApprox = strcat(fileApprox, dec2bin(bit + 1));
+            end
+        end
+    end
+    vectorApproxIndex = strcat(vectorApproxIndex, fileApprox); 
+end
 end
 
