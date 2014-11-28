@@ -1,11 +1,18 @@
-function [ wordFileVectors, bitsPerDims ] = getIndexStructure( bitsPerVector, datasetDir )
+function [ vectorApproxIndex, bitsPerDims, fileSize ] = getIndexStructure( bitsPerVector, datasetDir )
 
 % construct the data matrix for all the files
-[~, uniqueWords, dataMatrix] = getDataMatrix(datasetDir);
+[~, ~, dataMatrix] = getDataMatrix(datasetDir);
 [rowCount, colCount] = size(dataMatrix);
 
-% get normalized matrix
-dataMatrix = getNormalizedMatrix(dataMatrix);
+% get normalized matrix by computing L2 norm
+dataMatrixNorm = sqrt(sum(dataMatrix.^2,2));
+dataMatrixNormMatrix = repmat(dataMatrixNorm, [1 colCount]);
+dataMatrix = dataMatrix ./ dataMatrixNormMatrix;
+
+% dimensionality reduction
+[u, s, v] = svd(dataMatrix);
+eigenValues = diag(s);
+eigenC
 
 % array for bits per dimension
 bitsPerDims = zeros(1, colCount);
@@ -24,18 +31,25 @@ end
 
 % compute the vector approximation for each file and add to vector
 % approximiation index
-vectorApproxIndex = '';
+
+vectorApproxIndex = [];
+
 for fileId = 1 : rowCount
     fileApprox = '';
     for dimId = 1 : colCount
+        % divide the space into equal partitions
         partition = 1 / bitsPerDims(dimId);
         for bit = 0 : (bitsPerDims(dimId) - 1)
-            if((bit * partition) <= dataMatrix(fileId, dimId) && dataMatrix(fileId, dimId) < ((bit + 1) * partition))
-                fileApprox = strcat(fileApprox, dec2bin(bit + 1));
+            % determine into which partition the point falls into
+            if((bit * partition) <= dataMatrix(fileId, dimId) && dataMatrix(fileId, dimId) <= ((bit + 1) * partition))
+                fileApprox = strcat(fileApprox, dec2bin(bit, bitsPerDims(dimId)));
             end
         end
     end
-    vectorApproxIndex = strcat(vectorApproxIndex, fileApprox); 
+    vectorApproxIndex = [vectorApproxIndex; fileApprox]; 
 end
+
+fileSize = length(vectorApproxIndex) / 8;
+
 end
 
