@@ -22,6 +22,10 @@ reducedDataMatrix = u(:, 1:inherantDims) * s(1 : inherantDims, 1 : inherantDims)
 % size of reduced data matrix
 [rowCount, colCount] = size(reducedDataMatrix);
 
+% calculate the min and max boundaries
+minValues = min(reducedDataMatrix);
+maxValues = max(reducedDataMatrix);
+
 % array for bits per dimension
 bitsPerDims = zeros(1, colCount);
 
@@ -47,18 +51,34 @@ for fileId = 1 : rowCount
     fileApprox = '';
     for dimId = 1 : colCount
         % divide the space into equal partitions
-        partition = 1 / bitsPerDims(dimId);
-        for bit = 0 : (bitsPerDims(dimId) - 1)
-            % determine into which partition the point falls into
-            if((bit * partition) <= dataMatrix(fileId, dimId) && dataMatrix(fileId, dimId) <= ((bit + 1) * partition))
-                fileApprox = strcat(fileApprox, dec2bin(bit, bitsPerDims(dimId)));
+        width = (maxValues(dimId) - minValues(dimId)) / 2^bitsPerDims(dimId);
+        
+        % if the data point lies in the region < minValue + width
+        if(reducedDataMatrix(fileId, dimId) <= minValues(dimId) + width)
+            fileApprox = strcat(fileApprox, dec2bin(0, bitsPerDims(dimId)));
+        else
+             % if the data point lies in the region > maxValue - width
+            if(reducedDataMatrix(fileId, dimId) > maxValues(dimId) - width)
+            fileApprox = strcat(fileApprox, dec2bin((2^bitsPerDims(dimId) - 1), bitsPerDims(dimId)));
+            else
+                 % if the data point lies between the regions < minValue +
+                 % width and > maxValue - width
+                region = 0;
+                for boundary = minValues(dimId) + width : width : maxValues(dimId) - width
+                    region = region + 1;
+                    if(reducedDataMatrix(fileId, dimId) > boundary  && reducedDataMatrix(fileId, dimId) <= (boundary + width))
+                        fileApprox = strcat(fileApprox, dec2bin(region, bitsPerDims(dimId)));
+                    end
+                end
             end
         end
     end
     fileApproxIndex = [fileApproxIndex; fileApprox]; 
 end
 
-fileSize = length(fileApproxIndex) / 8;
+% compute the size of index file
+[rowSize, colSize] = size(fileApproxIndex);
+fileSize = (rowSize * colSize) / 8;
 
 end
 
