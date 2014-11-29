@@ -1,4 +1,4 @@
-function [ neighbours ] = getNearestNeighbours( queryWordFile, neighbourCount, totalFileCount, features, colIndexVector, reducedFeatures, minValues, maxValues, bitsPerDims, boundaries, dataSetRegions, reducedDataMatrix )
+function [ neighbours, vectorsExpanded ] = getNearestNeighbours( queryWordFile, neighbourCount, totalFileCount, features, colIndexVector, reducedFeatures, minValues, maxValues, bitsPerDims, boundaries, dataSetRegions, reducedDataMatrix )
 
 % represents query as vector by counting the number of unique words
 queryVector = zeros(1, length(features));
@@ -23,10 +23,11 @@ neighbours(:, 2) = Inf(neighbourCount, 1);
 % upperBounds = zeros(neighbourCount);
 
 distance = Inf;
-
+vectorsExpanded = 0;
 for fileId = 1 : totalFileCount
     [lowerBound, ~] = getBounds(reducedQueryVector, queryRegions, boundaries, dataSetRegions);
     if(lowerBound < distance)
+        vectorsExpanded = vectorsExpanded + 1;
         [distance, neighbours] = insertCandidate(norm(reducedDataMatrix(fileId) - reducedQueryVector), fileId, neighbourCount, neighbours);
     end
 end
