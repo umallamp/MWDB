@@ -1,9 +1,9 @@
-function [ fileApproxIndex, bitsPerDims, fileSize ] = getIndexStructure( bitsPerVector, datasetDir )
+function [ fileApproxIndex, bitsPerDims, fileSize, reducedFeatures, features, colIndexVector, minValues, maxValues, boundaries, dataSetRegions, reducedDataMatrix ] = getIndexStructure( bitsPerVector, datasetDir )
 
 variance = 99;
 
 % construct the data matrix for all the files
-[~, ~, dataMatrix] = getDataMatrix(datasetDir);
+[~, features, dataMatrix, colIndexVector] = getDataMatrix(datasetDir);
 [~, colCount] = size(dataMatrix);
 
 % get normalized matrix by computing L2 norm
@@ -18,6 +18,7 @@ eigenCSum = cumsum(eigenValues);
 eigenImportance = (eigenCSum / eigenCSum(length(eigenCSum))) * 100;
 inherantDims = find(eigenImportance <= variance, 1, 'last');
 reducedDataMatrix = u(:, 1:inherantDims) * s(1 : inherantDims, 1 : inherantDims);
+reducedFeatures = v(1 : inherantDims, :);
 
 % size of reduced data matrix
 [rowCount, colCount] = size(reducedDataMatrix);
@@ -44,34 +45,15 @@ end
 % compute the vector approximation for each file and add to vector
 % approximiation index
 
+[dataSetRegions, boundaries] = getRegions(reducedDataMatrix, minValues, maxValues, bitsPerDims);
+
 % approximation for all files
 fileApproxIndex = [];
 
 for fileId = 1 : rowCount
     fileApprox = '';
     for dimId = 1 : colCount
-        % divide the space into equal partitions
-        width = (maxValues(dimId) - minValues(dimId)) / 2^bitsPerDims(dimId);
-        
-        % if the data point lies in the region < minValue + width
-        if(reducedDataMatrix(fileId, dimId) <= minValues(dimId) + width)
-            fileApprox = strcat(fileApprox, dec2bin(0, bitsPerDims(dimId)));
-        else
-             % if the data point lies in the region > maxValue - width
-            if(reducedDataMatrix(fileId, dimId) > maxValues(dimId) - width)
-            fileApprox = strcat(fileApprox, dec2bin((2^bitsPerDims(dimId) - 1), bitsPerDims(dimId)));
-            else
-                 % if the data point lies between the regions < minValue +
-                 % width and > maxValue - width
-                region = 0;
-                for boundary = minValues(dimId) + width : width : maxValues(dimId) - width
-                    region = region + 1;
-                    if(reducedDataMatrix(fileId, dimId) > boundary  && reducedDataMatrix(fileId, dimId) <= (boundary + width))
-                        fileApprox = strcat(fileApprox, dec2bin(region, bitsPerDims(dimId)));
-                    end
-                end
-            end
-        end
+        fileApprox = strcat(fileApprox, dec2bin(dataSetRegions(fileId, dimId), bitsPerDims(dimId)));
     end
     fileApproxIndex = [fileApproxIndex; fileApprox]; 
 end

@@ -1,9 +1,9 @@
-function [ fileApproxIndex, bitsPerDims, fileSize ] = getIndexStructure( bitsPerVector, datasetDir )
+function [ fileApproxIndex, bitsPerDims, fileSize, re, features, colIndexVector ] = getIndexStructure( bitsPerVector, datasetDir )
 
 variance = 99;
 
 % construct the data matrix for all the files
-[~, ~, dataMatrix] = getDataMatrix(datasetDir);
+[~, features, dataMatrix, colIndexVector] = getDataMatrix(datasetDir);
 [~, colCount] = size(dataMatrix);
 
 % get normalized matrix by computing L2 norm
@@ -53,35 +53,32 @@ for fileId = 1 : rowCount
         % divide the space into equal partitions
         width = (maxValues(dimId) - minValues(dimId)) / 2^bitsPerDims(dimId);
         
-        if(dataMatrix(fileId, dimId) <= minValues(dimId) + width)
-            fileApprox = 
-            region = 0;
+        % if the data point lies in the region < minValue + width
+        if(reducedDataMatrix(fileId, dimId) <= minValues(dimId) + width)
+            fileApprox = strcat(fileApprox, dec2bin(0, bitsPerDims(dimId)));
         else
-            if(dataMatrix(fileId, dimId) > maxValues(dimId) - width)
-            region = 2^bitsPerDims(dimId) - 1;
+             % if the data point lies in the region > maxValue - width
+            if(reducedDataMatrix(fileId, dimId) > maxValues(dimId) - width)
+            fileApprox = strcat(fileApprox, dec2bin((2^bitsPerDims(dimId) - 1), bitsPerDims(dimId)));
             else
+                 % if the data point lies between the regions < minValue +
+                 % width and > maxValue - width
                 region = 0;
                 for boundary = minValues(dimId) + width : width : maxValues(dimId) - width
                     region = region + 1;
-                    if(dataMatrix(fileId, dimId) > boundary  && dataMatrix(fileId, dimId) <= (boundary + width))
-                    
+                    if(reducedDataMatrix(fileId, dimId) > boundary  && reducedDataMatrix(fileId, dimId) <= (boundary + width))
+                        fileApprox = strcat(fileApprox, dec2bin(region, bitsPerDims(dimId)));
                     end
                 end
-            end
-        end
-        
-        
-        for bit = 0 : 2^bitsPerDims(dimId)
-            % determine into which partition the point falls into
-            if((minValues(dimId) + (bit * width)) <= dataMatrix(fileId, dimId) && dataMatrix(fileId, dimId) <= (minValues(dimId) + ((bit + 1) * width)))
-                fileApprox = strcat(fileApprox, dec2bin(bit, bitsPerDims(dimId)));
             end
         end
     end
     fileApproxIndex = [fileApproxIndex; fileApprox]; 
 end
 
-fileSize = length(fileApproxIndex) / 8;
+% compute the size of index file
+[rowSize, colSize] = size(fileApproxIndex);
+fileSize = (rowSize * colSize) / 8;
 
 end
 

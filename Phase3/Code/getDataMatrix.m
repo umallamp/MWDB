@@ -1,4 +1,4 @@
-function [ entireWords, uniqueWords, dataMatrix ] = getDataMatrix( datasetDir )
+function [ entireWords, uniqueWords, dataMatrix, colIndexVector ] = getDataMatrix( datasetDir )
 
 % required fileds
 delimiterIn = ',';
@@ -59,4 +59,5 @@ for index = 1 : row
     if(~isempty(foundIndex))
         dataMatrix(fileFeatureCount(index, 1), foundIndex) =  fileFeatureCount(index, 2);
     end
+end
 end

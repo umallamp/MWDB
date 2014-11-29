@@ -1,0 +1,82 @@
+function [ regions ] = getRegions( reducedMatrix, minValues, maxValues, bitsPerDims )
+
+% size of reduced data matrix
+[rowCount, colCount] = size(reducedMatrix);
+regions = zeros(rowCount, colCount);
+
+% initialize boundary values
+boundaries = zeros(colCount, (2^max(bitsPerDims) + 1));
+
+% compute boundary values for each dimension
+for dimId = 1 : length(bitsPerDims)
+    width = (maxValues(dimId) - minValues(dimId)) / 2^bitsPerDims(dimId);
+    
+    % min boundary is - Inf and max boundary is +Inf
+    boundaries(dimId, 1) = -1 * Inf;
+    boundaries(dimId, (2^bitsPerDims(dimId) + 1)) = Inf;
+    
+    % compute the boundary values for other regions
+    weight = 1;
+    for boundaryId = 2 : 2^bitsPerDims(dimId)
+        boundaries(dimId, boundaryId) = minValues(dimId) + width * weight; 
+        weight = weight + 1;
+    end
+end
+
+% for fileId = 1 : rowCount
+%     for dimId = 1 : colCount
+%         % divide the space into equal partitions
+%         width = (maxValues(dimId) - minValues(dimId)) / 2^bitsPerDims(dimId);
+%         
+%         % if the data point lies in the region < minValue + width
+%         if(reducedMatrix(fileId, dimId) <= minValues(dimId) + width)
+%             regions(fileId, dimId) = 0;
+%         else
+%              % if the data point lies in the region > maxValue - width
+%             if(reducedMatrix(fileId, dimId) > maxValues(dimId) - width)
+%             regions(fileId, dimId) = 2^bitsPerDims(dimId) - 1;
+%             else
+%                  % if the data point lies between the regions < minValue +
+%                  % width and > maxValue - width
+%                 region = 0;
+%                 for boundary = minValues(dimId) + width : width : maxValues(dimId) - width
+%                     region = region + 1;
+%                     if(reducedMatrix(fileId, dimId) > boundary  && reducedMatrix(fileId, dimId) <= (boundary + width))
+%                         regions(fileId, dimId) = region;
+%                     end
+%                 end
+%             end
+%         end
+%     end 
+% end
+
+for fileId = 1 : rowCount
+    for dimId = 1 : colCount
+        for boundaryId = 1 : 2^bitsPerDims(dimId)
+            if(reducedMatrix(fileId, dimId) > boundaries(boundaryId)  && reducedMatrix(fileId, dimId) <= boundaries(boundaryId + 1))
+                regions(fileId, dimId) = region;
+        
+        % if the data point lies in the region < minValue + width
+        if(reducedMatrix(fileId, dimId) <= minValues(dimId) + width)
+            regions(fileId, dimId) = 0;
+        else
+             % if the data point lies in the region > maxValue - width
+            if(reducedMatrix(fileId, dimId) > maxValues(dimId) - width)
+            regions(fileId, dimId) = 2^bitsPerDims(dimId) - 1;
+            else
+                 % if the data point lies between the regions < minValue +
+                 % width and > maxValue - width
+                region = 0;
+                for boundary = minValues(dimId) + width : width : maxValues(dimId) - width
+                    region = region + 1;
+                    if(reducedMatrix(fileId, dimId) > boundary  && reducedMatrix(fileId, dimId) <= (boundary + width))
+                        regions(fileId, dimId) = region;
+                    end
+                end
+            end
+        end
+    end 
+end
+
+end
+
