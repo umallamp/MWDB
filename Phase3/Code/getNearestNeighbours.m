@@ -11,7 +11,8 @@ end
 queryVector = queryVector / norm(queryVector);
 
 % get reduced query vector and regions for dimensions
-reducedQueryVector = queryVector * reducedFeatures';
+% reducedQueryVector = queryVector * reducedFeatures';
+reducedQueryVector = queryVector;
 queryRegions = getRegions(reducedQueryVector, minValues, maxValues, bitsPerDims);
 
 % initialize variables for query processing
@@ -26,19 +27,19 @@ distance = Inf;
 for fileId = 1 : totalFileCount
     [lowerBound, ~] = getBounds(reducedQueryVector, queryRegions, boundaries, dataSetRegions);
     if(lowerBound < distance)
-        distance = insertCandidate(norm(reducedDataMatrix(fileId) - reducedQueryVector), fileId, neighbourCount, neighbours);
+        [distance, neighbours] = insertCandidate(norm(reducedDataMatrix(fileId) - reducedQueryVector), fileId, neighbourCount, neighbours);
     end
 end
 end
 
-function [ maxDistance ] = insertCandidate(distance, fileId, neighbourCount, neighbours)
+function [ maxDistance, neighbours ] = insertCandidate(distance, fileId, neighbourCount, neighbours)
     if(distance < neighbours(neighbourCount, 2))
         % insert the candidate and the distance
         neighbours(neighbourCount, 1) = fileId;
         neighbours(neighbourCount, 2) = distance;
 
         % sort neighbours based on distance
-        [~, order] = sort(neighbours(:,1));
+        [~, order] = sort(neighbours(:,2));
         neighbours = neighbours(order, :);
     end
     maxDistance = neighbours(neighbourCount, 2);

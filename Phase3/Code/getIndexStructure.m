@@ -11,21 +11,26 @@ dataMatrixNorm = sqrt(sum(dataMatrix.^2,2));
 dataMatrixNormMatrix = repmat(dataMatrixNorm, [1 colCount]);
 dataMatrix = dataMatrix ./ dataMatrixNormMatrix;
 
+reducedDataMatrix = dataMatrix;
+reducedFeatures = features;
+
 % dimensionality reduction
-[u, s, v] = svd(dataMatrix);
-eigenValues = diag(s);
-eigenCSum = cumsum(eigenValues);
-eigenImportance = (eigenCSum / eigenCSum(length(eigenCSum))) * 100;
-inherantDims = find(eigenImportance <= variance, 1, 'last');
-reducedDataMatrix = u(:, 1:inherantDims) * s(1 : inherantDims, 1 : inherantDims);
-reducedFeatures = v(1 : inherantDims, :);
+% [u, s, v] = svd(dataMatrix);
+% eigenValues = diag(s);
+% eigenCSum = cumsum(eigenValues);
+% eigenImportance = (eigenCSum / eigenCSum(length(eigenCSum))) * 100;
+% inherantDims = find(eigenImportance <= variance, 1, 'last');
+% reducedDataMatrix = u(:, 1:inherantDims) * s(1 : inherantDims, 1 : inherantDims);
+% reducedFeatures = v(1 : inherantDims, :);
 
 % size of reduced data matrix
 [rowCount, colCount] = size(reducedDataMatrix);
 
 % calculate the min and max boundaries
-minValues = min(reducedDataMatrix);
-maxValues = max(reducedDataMatrix);
+% minValues = min(reducedDataMatrix);
+% maxValues = max(reducedDataMatrix);
+minValues = zeros(colCount);
+maxValues = ones(colCount);
 
 % array for bits per dimension
 bitsPerDims = zeros(1, colCount);

@@ -12,13 +12,15 @@ for dimId = 1 : length(bitsPerDims)
     width = (maxValues(dimId) - minValues(dimId)) / 2^bitsPerDims(dimId);
     
     % min boundary is - Inf and max boundary is +Inf
-    boundaries(dimId, 1) = -1 * Inf;
-    boundaries(dimId, (2^bitsPerDims(dimId) + 1)) = Inf;
+    %     boundaries(dimId, 1) = -1 * Inf;
+    %     boundaries(dimId, (2^bitsPerDims(dimId) + 1)) = Inf;
+    boundaries(dimId, 1) = minValues(dimId);
+    boundaries(dimId, (2^bitsPerDims(dimId) + 1)) = maxValues(dimId);
     
     % compute the boundary values for other regions
     weight = 1;
     for boundaryId = 2 : 2^bitsPerDims(dimId)
-        boundaries(dimId, boundaryId) = minValues(dimId) + width * weight; 
+        boundaries(dimId, boundaryId) = minValues(dimId) + width * weight;
         weight = weight + 1;
     end
 end
