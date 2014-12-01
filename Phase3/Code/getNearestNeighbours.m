@@ -25,10 +25,10 @@ neighbours(:, 2) = Inf(neighbourCount, 1);
 distance = Inf;
 vectorsExpanded = 0;
 for fileId = 1 : totalFileCount
-    [lowerBound, ~] = getBounds(reducedQueryVector, queryRegions, boundaries, dataSetRegions);
+    [lowerBound, ~] = getBounds(reducedQueryVector, queryRegions, boundaries, dataSetRegions(fileId, :));
     if(lowerBound < distance)
         vectorsExpanded = vectorsExpanded + 1;
-        [distance, neighbours] = insertCandidate(norm(reducedDataMatrix(fileId) - reducedQueryVector), fileId, neighbourCount, neighbours);
+        [distance, neighbours] = insertCandidate(norm(reducedDataMatrix(fileId, :) - reducedQueryVector), fileId, neighbourCount, neighbours);
     end
 end
 end

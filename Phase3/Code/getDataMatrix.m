@@ -32,7 +32,7 @@ for fileId = 1 : length(directoryFiles)
     % 3 : cSize feature values of the word
     for index = 1 : rSize
         count = count + 1;
-        fileFeatureCount(count, 1) = fileId;
+        fileFeatureCount(count, 1) = str2double(fname);
         fileFeatureCount(count, 2) = sum(ismember(fileData(:, colIndexVector), fileUniqueWords(index, :),'rows'));
         fileFeatureCount(count, 3 : cSize + 2) = fileUniqueWords(index, :);
     end

@@ -27,10 +27,10 @@ reducedFeatures = features;
 [rowCount, colCount] = size(reducedDataMatrix);
 
 % calculate the min and max boundaries
-% minValues = min(reducedDataMatrix);
-% maxValues = max(reducedDataMatrix);
-minValues = zeros(colCount);
-maxValues = ones(colCount);
+minValues = min(reducedDataMatrix);
+maxValues = max(reducedDataMatrix);
+% minValues = zeros(colCount);
+% maxValues = ones(colCount);
 
 % array for bits per dimension
 bitsPerDims = zeros(1, colCount);
