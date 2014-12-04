@@ -1,27 +1,16 @@
-function [ fileApproxIndex, bitsPerDims, fileSize, reducedFeatures, features, colIndexVector, minValues, maxValues, boundaries, dataSetRegions, reducedDataMatrix ] = getIndexStructure( bitsPerVector, datasetDir )
+function [ fileApproxIndex, bitsPerDims, fileSize, reCreateMatrix, features, colIndexVector, minValues, maxValues, boundaries, dataSetRegions, reducedDataMatrix ] = getIndexStructure( bitsPerVector, datasetDir )
 
-variance = 99;
 
 % construct the data matrix for all the files
 [~, features, dataMatrix, colIndexVector] = getDataMatrix(datasetDir);
-[~, colCount] = size(dataMatrix);
 
 % get normalized matrix by computing L2 norm
-dataMatrixNorm = sqrt(sum(dataMatrix.^2,2));
-dataMatrixNormMatrix = repmat(dataMatrixNorm, [1 colCount]);
-dataMatrix = dataMatrix ./ dataMatrixNormMatrix;
+dataMatrix = getNormalizedMatrix(dataMatrix);
 
 % reducedDataMatrix = dataMatrix;
 % reducedFeatures = features;
 
-% dimensionality reduction
-[u, s, v] = svd(dataMatrix);
-eigenValues = diag(s);
-eigenCSum = cumsum(eigenValues);
-eigenImportance = (eigenCSum / eigenCSum(length(eigenCSum))) * 100;
-inherantDims = find(eigenImportance <= variance, 1, 'last');
-reducedDataMatrix = u(:, 1:inherantDims) * s(1 : inherantDims, 1 : inherantDims);
-reducedFeatures = v(:, 1 : inherantDims);
+[ reducedDataMatrix, reCreateMatrix ] = getReducedMatrix( dataMatrix );
 
 % size of reduced data matrix
 [rowCount, colCount] = size(reducedDataMatrix);

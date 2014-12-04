@@ -1,4 +1,4 @@
-function [ neighbours, vectorsExpanded, reducedQueryVector ] = getNearestNeighbours( queryWordFile, neighbourCount, totalFileCount, features, colIndexVector, reducedFeatures, minValues, maxValues, bitsPerDims, boundaries, dataSetRegions, reducedDataMatrix )
+function [ neighbours, vectorsExpanded, reducedQueryVector ] = getNearestNeighbours( queryWordFile, neighbourCount, totalFileCount, features, colIndexVector, reCreateMatrix, minValues, maxValues, bitsPerDims, boundaries, dataSetRegions, reducedDataMatrix )
 
 % represents query as vector by counting the number of unique words
 queryVector = zeros(1, length(features));
@@ -11,7 +11,7 @@ end
 queryVector = queryVector / norm(queryVector);
 
 % get reduced query vector and regions for dimensions
-reducedQueryVector = queryVector * reducedFeatures;
+reducedQueryVector = queryVector * reCreateMatrix;
 % reducedQueryVector = queryVector;
 queryRegions = getRegions(reducedQueryVector, minValues, maxValues, bitsPerDims);
 
