@@ -27,13 +27,12 @@ classLabels = zeros(length(labels), 2);
 
 % create a data structure for fileId, classLabel
 for index = 1 : length(labels)
-    disp(index);
     fileName = char(fileNames(index + 1));
     [~, fileId, ~] = fileparts(fileName);
     classLabels(index, :) = [str2double(fileId) labels(index)];
 end
 
-testLabels = zeros(rowCount - length(labels), 2);
+testLabels = [];
 count = 0;
 for fileId = 1 : rowCount
     distancesWithLabels = zeros(length(labels), 2);
@@ -56,7 +55,7 @@ for fileId = 1 : rowCount
         uniqueLabels = neighbourLabels(sort(indices));
         
         % find the frequency of class labels
-        uniqueLabelsCount = zeros(length(uniqueLabels));
+        uniqueLabelsCount = zeros(length(uniqueLabels), 1);
         for index = 1 : length(uniqueLabels)
             uniqueLabelsCount(index) = length(find(neighbourLabels == uniqueLabels(index)));
         end
@@ -64,11 +63,9 @@ for fileId = 1 : rowCount
         % find the class lable with highest frequency and assign to the
         % file
         [~, maxIndex] = max(uniqueLabelsCount);
-        count = count + 1;
-        testLabels(count, :) = [ fileId uniqueLabels(maxIndex)];
+        testLabels = [testLabels; [fileId uniqueLabels(maxIndex)]];
     end
 end
-
 end
 
 
