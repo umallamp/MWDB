@@ -1,6 +1,0 @@
-function [ distance ] = getDistance( vectorOne, vectorTwo )
-
-distance = norm(vectorOne - vectorTwo);
-
-end
-
