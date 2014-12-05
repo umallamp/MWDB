@@ -17,50 +17,67 @@ reducedQueryVector = queryVector * reCreateMatrix;
 % reducedQueryVector = queryVector;
 queryRegions = getRegions(reducedQueryVector, minValues, maxValues, bitsPerDims);
 
+% perform phase 1 and phase 2 of the algorithms
 [ lowerBoundsHeap ] = phaseOne( reducedQueryVector, dataSetRegions, queryRegions, boundaries, totalFileCount, neighbourCount );
 [ neighbours, vectorsExpanded ] = phaseTwo(lowerBoundsHeap, reducedDataMatrix, neighbourCount, reducedQueryVector);
 
 end
 
-
+% Phase 1 of the algorithm
 function [ lowerBoundsHeap ] = phaseOne( reducedQueryVector, dataSetRegions, queryRegions, boundaries, totalFileCount, neighbourCount )
-    distance = Inf;
-    neighbours = initCandidate(neighbourCount);
-    lowerBoundsHeap = [];
+distance = Inf;
+neighbours = initCandidate(neighbourCount);
+lowerBoundsHeap = [];
 
-    for fileId = 1 : totalFileCount
-        [lowerBound, upperBound] = getBounds(reducedQueryVector, queryRegions, boundaries, dataSetRegions(fileId, :));
-        if(lowerBound <= distance)
-            [distance, neighbours] = insertCandidate(upperBound, fileId, neighbourCount, neighbours);
-            lowerBoundsHeap = [ lowerBoundsHeap; [fileId lowerBound] ];
-        end
+% for each file calculate the lower and upper bound
+for fileId = 1 : totalFileCount
+    [lowerBound, upperBound] = getBounds(reducedQueryVector, queryRegions, boundaries, dataSetRegions(fileId, :));
+    
+    % insert into heap only if the lower bound is less than the maximum
+    % upper bound occured so far
+    if(lowerBound <= distance)
+        [distance, neighbours] = insertCandidate(upperBound, fileId, neighbourCount, neighbours);
+        lowerBoundsHeap = [ lowerBoundsHeap; [fileId lowerBound] ];
     end
-    [~, order] = sort(lowerBoundsHeap(:,2));
-    lowerBoundsHeap = lowerBoundsHeap(order, :);
 end
 
-function [ neighbours, vectorsExpanded ] = phaseTwo(lowerBoundsHeap, reducedDataMatrix, neighbourCount, reducedQueryVector)
-    count = 1;
-    vectorsExpanded = 0;
-    distance = Inf;
-    neighbours = initCandidate(neighbourCount);
+% sort the heap
+[~, order] = sort(lowerBoundsHeap(:,2));
+lowerBoundsHeap = lowerBoundsHeap(order, :);
 
-    fileId = lowerBoundsHeap(count, 1);
-    lowerBound = lowerBoundsHeap(count, 2);
+end
+
+% Phase 2 of the algorithm
+function [ neighbours, vectorsExpanded ] = phaseTwo(lowerBoundsHeap, reducedDataMatrix, neighbourCount, reducedQueryVector)
+count = 1;
+vectorsExpanded = 0;
+distance = Inf;
+neighbours = initCandidate(neighbourCount);
+
+% get the lower bound of the first file in the heap
+fileId = lowerBoundsHeap(count, 1);
+lowerBound = lowerBoundsHeap(count, 2);
+[heapMaxRow, ~] = size(lowerBoundsHeap);
+
+while(lowerBound < distance && count <= heapMaxRow)
     
-    while(lowerBound < distance)
+    % calculate the original distance between the query vector and file
+    vectorsExpanded = vectorsExpanded + 1;
+    [distance, neighbours] = insertCandidate(getDistance(reducedDataMatrix(fileId, :), reducedQueryVector), fileId, neighbourCount, neighbours);
+    
+    % get the next file in the heap
+    if(count < heapMaxRow)
         count = count + 1;
-        vectorsExpanded = vectorsExpanded + 1;
-        [distance, neighbours] = insertCandidate(norm(reducedDataMatrix(fileId, :) - reducedQueryVector), fileId, neighbourCount, neighbours);
         fileId = lowerBoundsHeap(count, 1);
         lowerBound = lowerBoundsHeap(count, 2);
     end
 end
+end
 
 function [ neighbours ] = initCandidate(neighbourCount)
-    % initialize variables for query processing
-    neighbours = zeros(neighbourCount, 2);
-    neighbours(:, 2) = Inf(neighbourCount, 1);
+% initialize variables for query processing
+neighbours = zeros(neighbourCount, 2);
+neighbours(:, 2) = Inf(neighbourCount, 1);
 end
 
 function [ maxDistance, neighbours ] = insertCandidate(distance, fileId, neighbourCount, neighbours)
